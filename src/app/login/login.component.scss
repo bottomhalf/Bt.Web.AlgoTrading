@@ -1,0 +1,19 @@
+.container-fluid{
+    background-image: linear-gradient(-135deg, #c850c0, #4158d0) !important;
+}
+
+.signin-container {
+    width: 100%;
+    max-width: 350px;
+    padding: 15px;
+    margin: auto;
+}
+
+input {
+    box-shadow: none !important;
+    border: none !important;
+}
+
+.error-validation {
+    border: 2px solid red !important;
+}

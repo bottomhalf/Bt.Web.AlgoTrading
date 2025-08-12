@@ -1,0 +1,95 @@
+.nav-bg-img {
+    min-height: 100vh;
+  }
+  
+  .nav-bg {
+    background-color: #f6f8fa !important;
+  }
+  
+  .active {
+    font-weight: bold;
+    text-decoration: underline;
+  }
+
+  nav {
+    transition: background-color 0.3s ease;
+  }
+  
+  nav.scrolled {
+    background-color: #fff !important; /* change to your desired color */
+  }
+
+  .z-3 {
+    z-index: 99999999999999 !important;
+    width: 100%;
+    top: 0;
+  }
+
+
+.u-nav-item {
+    align-items: center;
+    background-color: initial;
+    border: 0;
+    border-radius: var(--borderRadius-medium);
+    color: var(--fgColor-default);
+    cursor: pointer;
+    //display: flex;
+    font-size: var(--text-body-size-medium);
+    line-height: 30px;
+    // padding: 0 var(--control-medium-paddingInline-condensed);
+    position: relative;
+    text-align: center;
+    white-space: nowrap;
+}
+
+.u-nav-item::after {
+    background: var(--underlineNav-borderColor-active);
+    border-radius: var(--borderRadius-medium);
+    bottom: calc(50% - 1.25rem);
+    content: "";
+    height: 2px;
+    position: absolute;
+    right: 50%;
+    transform: translate(50%, -50%);
+    width: 100%;
+    z-index: 1;
+    transition: all 0.5s linear;
+}
+
+.UnderlineNav-body {
+    align-items: center;
+    display: flex;
+    gap: var(--control-medium-gap);
+    list-style: none;
+    line-height: 2.4;
+}
+
+.navbar {
+  min-height: 32px;
+  font-size: 18px;
+}
+
+.navbar-brand {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+.input-group-sm > .form-control,
+.input-group-sm > .input-group-text {
+  height: 24px;
+  padding: 0 8px;
+  font-size: 12px;
+}
+
+.badge {
+  font-size: 8px;
+  padding: 2px 4px;
+}
+
+.border-secondary {
+  border-color: #2d2d2d !important;
+}
+
+.bg-black {
+  background-color: #000 !important;
+}

@@ -1,0 +1,170 @@
+/* You can add global styles to this file, and also import other style files */
+
+:root {
+  --underlineNav-borderColor-active: #fd8c73;
+  --borderRadius-medium: 0.375rem;
+  --control-medium-gap: 0.5rem;
+}
+
+.btn-primary-c {
+  color: #fff !important;
+  background-color: #337ab7 !important;
+  border-color: #2e6da4 !important;
+}
+
+.btn-primary-c:hover {
+  color: #fff !important;
+  background-color: #286090 !important;
+  border-color: #204d74 !important;
+}
+
+input::placeholder {
+  color: #ccc !important;
+  opacity: 1;
+  /* Firefox */
+}
+
+input:-ms-input-placeholder {
+  /* Internet Explorer 10-11 */
+  color: #ccc !important;
+}
+
+input::-ms-input-placeholder {
+  /* Microsoft Edge */
+  color: #ccc !important;
+}
+
+
+select:focus,
+a:focus,
+input:focus {
+  outline: none !important;
+  border-color: 1px solid #d9d9d9 !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+select,
+a,
+label,
+input,
+button,
+textarea {
+  outline: none !important;
+  -webkit-box-shadow: none !important;
+  box-shadow: none !important;
+}
+
+
+.x_content {
+  padding: 0 5px 6px;
+  position: relative;
+  width: 100%;
+  float: left;
+  clear: both;
+  margin-top: 5px;
+}
+
+.x_panel {
+  position: relative;
+  width: 100%;
+  min-height: 100px;
+  height: calc(100vh - var(--navbar-height) - var(--content-header-height) - 3rem) !important;
+  margin-bottom: 10px;
+  padding: 10px 12px;
+  display: inline-block;
+  background: #fff;
+  border: 1px solid #e6e9ed;
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+  opacity: 1;
+  transition: all 0.2s ease;
+  overflow-y: auto;
+}
+
+.x_panel_body {
+  position: relative;
+  width: 100%;
+  height: auto !important;
+  padding: 10px 12px;
+  display: inline-block;
+  background: #fff;
+  border: 1px solid #e6e9ed;
+  -webkit-column-break-inside: avoid;
+  -moz-column-break-inside: avoid;
+}
+
+.x_header h2 {
+  margin: 5px 0 6px;
+  float: left;
+  display: block;
+  font-size: 16px !important;
+  font-weight: 400;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+  font-weight: 500;
+  color: darkgray;
+}
+
+.x_header h2 small {
+  margin-left: 10px;
+  font-size: 12px !important;
+  color: darkgray;
+}
+
+.x_header {
+  // border-bottom: 2px solid #e6e9ed;
+  padding: 1px 5px 6px;
+  margin-bottom: 10px;
+}
+
+.x_header_title {
+  margin-bottom: 2px;
+  display: inline-block;
+  width: 100%;
+}
+
+.main-container {
+  padding: 1.5rem 1.5rem 1rem 1.5rem !important;
+  overflow: hidden !important;
+  height: 100%;
+}
+
+.error-field {
+  border: 1px solid red !important;
+  border-right: 4px solid red !important;
+}
+
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}
+
+@media (min-width: 1400px) {
+  .left-sidebar {
+    width: 336px !important;
+  }
+  .right-sidebar {
+    width: calc(100% - 336px) !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .left-sidebar {
+    width: 320px !important;
+  }
+
+  .right-sidebar {
+    width: calc(100% - 320px) !important;
+  }
+}
+
+.form-control:disabled, 
+.form-control[readonly] {
+    background-color: #e9ecef !important;
+    opacity: 1 !important;
+}

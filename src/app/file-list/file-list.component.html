@@ -1,0 +1,337 @@
+<div class="container-fluid">
+  <div class="row">
+    @if (isPageReady) {
+      @if (fileDetails != null && fileDetails.length > 0) {
+        <div class="left-sidebar border-end mt-1">
+          <app-tree [nodes]="nodes" [parentId]="parentId" (valueChange)="handleValueChange($event)"></app-tree>
+        </div>
+      }
+    <div class="right-sidebar pt-3" [ngClass]="{'right-sidebar': fileDetails != null && fileDetails.length > 0}">
+      <div class="row justify-content-between align-items-center">
+        <div class="col-auto">
+          <app-breadcrums [title]="'Generate bill'" [routes]="routePath"
+            (loadRoute)="loadRoute($event)"></app-breadcrums>
+        </div>
+        <div class="col-auto d-flex align-items-center pb-2">
+          <button class="btn btn-outline-success col-auto" (click)="addFolderPopup()"><i
+              class="fa-solid fa-plus pe-1"></i>Add Folder</button>
+          <div class="col-auto text-end ms-2">
+            <div ngbDropdown placement="bottom-end" class="d-inline-block">
+              <button type="button" class="btn btn-outline-primary" id="dropdownBasic2" ngbDropdownToggle>Add
+                File</button>
+              <div ngbDropdownMenu aria-labelledby="dropdownBasic2">
+                <button ngbDropdownItem (click)="addTokenFilePoppup()"><i class="fa-solid fa-plus"></i> Create Token
+                  File</button>
+                <button ngbDropdownItem (click)="addNewFile()"><i class="fa-solid fa-plus"></i> Create Normal
+                  File</button>
+                <button ngbDropdownItem (click)="tokenFilePopup()"><i class="fa-solid fa-plus"></i> Upload File</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      @if (fileDetails != null && fileDetails.length > 0) {
+        <div class="col-md-12 ">
+          <table class="table border rounded" style="table-layout: fixed; width: 100%;">
+            <tbody>
+              @for (item of fileDetails; track $index) {
+                <tr>
+                  <td style="width: 60%;">
+                    <div class="text-truncate">
+                      <i class="{{getFileIcon(item.Extension)}} me-2"></i>
+                      <a href="javascript:void(0)" class="text-decoration-none text-dark file-name"
+                        (click)="loadNext(item)">
+                          {{item.FileName}}
+                          @if (item.Extension != null && item.Extension != 'dir') {
+                            .{{item.Extension}}
+                          }
+                      </a>
+                    </div>
+                  </td>
+                  <td width="10%">
+                    Admin
+                  </td>
+                  <td width="10%">
+                     {{item.CreatedOn | date}}
+                  </td>
+                  <td class="text-end" width="10%">
+                    @if (item.Extension == 'dir') {
+                      <a href="javascript:void(0)" (click)="editFolderPopup(item)">
+                        <i class="fa-solid fa-pencil"></i>
+                      </a>
+                    } @else {
+                      <a href="javascript:void(0)" class="me-3 text-danger" (click)="deleteFilePopup(item)">
+                        <i class="fa-solid fa-trash"></i>
+                      </a>
+                      @if (item.BaseFolder == null) {
+                        <a href="javascript:void(0)" (click)="viewFile(item)">
+                          <i class="fa-solid fa-pencil"></i>
+                        </a>
+                      } @else {
+                        <a href="javascript:void(0)" (click)="viewSystemFile(item)">
+                          <i class="fa-solid fa-pencil"></i>
+                        </a>
+                      }
+                    }
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <app-record-not-found></app-record-not-found>
+      }
+    </div>
+    }
+  </div>
+</div>
+
+
+<!-- Delete file alert modal -->
+<div class="modal fade" id="deleteFileModal" tabindex="-1" aria-labelledby="deleteFileModalLabel" aria-hidden="true"
+  data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        @if (selectDeleteFile != null) {
+        Do you really want to delete
+        <span class="fw-bold">{{selectDeleteFile.FileName}}</span> file.
+        }
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" [disabled]="isLoading">Close</button>
+        <button type="button" class="btn btn-danger" [disabled]="isLoading" (click)="deleteFile()">
+          <i class="fa-solid" [ngClass]="{'fa-spinner fa-spin': isLoading, 'fa-trash': !isLoading}"></i>
+          {{ isLoading ? 'Wait' : 'Delete' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete file alert modal -->
+<div class="modal fade" id="manageTokenFileModal" tabindex="-1" aria-labelledby="manageTokenFileModalLabel"
+  aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content px-3">
+      <div class="modal-header border-bottom-0">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Token File Detail</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <label class="form-label">File Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="File Name" [(ngModel)]="tokenFileDetail.FileName"
+            [ngClass]="{'error-field': submitted && (tokenFileDetail.FileName == null || tokenFileDetail.FileName == '')}">
+        </div>
+        <div class="col-md-12 mt-3">
+          <label class="form-label">Key <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="Secret key" [(ngModel)]="tokenFileDetail.Key"
+            [ngClass]="{'error-field': submitted && (tokenFileDetail.Key == null || tokenFileDetail.Key == '')}">
+          <p class="mb-0 text-end">
+            <a href="javascript:void(0)" (click)="generateSecretKey()" class="">Generate Key</a>
+          </p>
+        </div>
+        <div class="col-md-12 mt-3">
+          <label class="form-label">Issuer <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="Issuer" [(ngModel)]="tokenFileDetail.Issuer"
+            [ngClass]="{'error-field': submitted && (tokenFileDetail.Issuer == null || tokenFileDetail.Issuer == '')}">
+        </div>
+        <div class="col-md-12 mt-3">
+          <label class="form-label">Company Code <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="Company Code" [(ngModel)]="tokenFileDetail.code"
+            [ngClass]="{'error-field': submitted && (tokenFileDetail.code == null || tokenFileDetail.code == '')}">
+        </div>
+        <div class="col-md-12 mt-3">
+          <label class="form-label">Expiry Time (seconds) <span class="text-danger">*</span></label>
+          <input type="number" class="form-control" placeholder="Issuer"
+            [(ngModel)]="tokenFileDetail.ExpiryTimeInSeconds"
+            [ngClass]="{'error-field': submitted && (tokenFileDetail.ExpiryTimeInSeconds == null || tokenFileDetail.ExpiryTimeInSeconds < 6000)}">
+        </div>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" [disabled]="isLoading">Close</button>
+        <button type="button" class="btn btn-primary-c" [disabled]="isLoading" (click)="saveTokenDetail()">
+          <i class="fa-solid" [ngClass]="{'fa-spinner fa-spin': isLoading, 'fa-floppy-disk': !isLoading}"></i>
+          {{ isLoading ? 'Wait' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Manage Folder -->
+<div class="modal fade" id="manageFolderModal" tabindex="-1" aria-labelledby="manageFolderModalLabel" aria-hidden="true"
+  data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content px-3">
+      <div class="modal-header border-bottom-0">
+        <h1 class="modal-title fs-5" id="exampleModalLabel">Manage folder name</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <label class="form-label">Folder Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="Folder Name" [(ngModel)]="folderDetail.FileName"
+            [ngClass]="{'error-field': submitted && (folderDetail.FileName == null || folderDetail.FileName == '')}">
+        </div>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" [disabled]="isLoading">Close</button>
+        <button type="button" class="btn btn-primary-c" [disabled]="isLoading" (click)="manageFolderDetail()">
+          <i class="fa-solid" [ngClass]="{'fa-spinner fa-spin': isLoading, 'fa-floppy-disk': !isLoading}"></i>
+          {{ isLoading ? 'Wait' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Active and Deactive  Model -->
+<div class="modal fade" data-bs-backdrop="static" data-bs-keyboard="false" id="uploadCustomFileModal" tabindex="-1"
+  role="dialog" aria-labelledby="uploadCustomFileModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header border-bottom-0">
+        <h4 class="modal-title">Upload Token File</h4>
+        <button type="button" (click)="cleanFileHandler()" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body row overflow-hidden">
+        <div class="col-md-12 row">
+          <div class="col-md-6">
+            <input type="file" id="uploadexcelreader" (change)="readExcelData($event)" class="d-none"/>
+            <div class="page-card">
+              <div class="card">
+                <div class="col-md-12 p-0">
+                  <div class="table-responsive">
+                    <div class="tab-pane fade show active" id="home" role="tabpanel" aria-labelledby="home-tab">
+                      <div role="tabpanel" class="active in mt-4 ps-4 pe-4" id="tab_content1"
+                        aria-labelledby="home-tab">
+                        <div id="classmasterdata" class="col-md-12">
+                          <div name="ifilezone" class="ifilezone mb-4" (click)="excelfireBrowserFile()">
+                            <div class="col-md-12 py-3 custom-bg justify-content-center" *ngIf="isFileReady"
+                              name="uploading">
+                              <img src="assets/files.jpg" width="35%" />
+                              <div class="filetitle d-flex align-items-center">
+                                File:
+                                <div name="filename" class="col-md-11 text-truncate"
+                                  style="display: inline-block !important;">
+                                  {{ fileName }}
+                                </div>
+                              </div>
+                              <div>
+                                File size: &nbsp;
+                                <div name="filesize" style="display: inline-block !important;">
+                                  {{ fileSize }}
+                                </div>
+                                KB
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6 solid-bg ps-3 rounded">
+            <div class="filetitle text-center">Upload File Details</div>
+            <div *ngIf="isFileReady">
+              <div class="fw-bold">
+                File:
+                <div name="filename" style="display: inline-block !important;">
+                  {{ fileName }}
+                </div>
+              </div>
+              <div>
+                <div>
+                  File size: &nbsp;
+                  <div name="filesize" style="display: inline-block !important;">
+                    {{ fileSize }}
+                  </div>
+                  KB
+                </div>
+                <div>
+                  File type: &nbsp;
+                  <div name="uploadingdatetime" style="display: inline-block !important;">
+                    {{ file.type }}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div *ngIf="!isFileReady">
+              <div class="fw-bold">
+                File: NA
+              </div>
+              <div>
+                <div>
+                  File size: &nbsp; NA
+                </div>
+                <div>
+                  No. of record(s): &nbsp; NA
+                </div>
+                <div>
+                  File type: &nbsp; NA
+                </div>
+              </div>
+            </div>
+            <div class="mt-4">
+              <button type="button" class="btn btn-primary-c" (click)="uploadExcel()" [disabled]="isDisable">
+                <i class="fa-solid" [ngClass]="{'fa-spinner fa-spin': isLoading, 'fa-upload': !isLoading}"></i>
+                <span class="ps-2">{{ isLoading ? 'Wait ...' : 'Upload' }}</span>
+              </button>
+              <button type="button" class="btn btn-outline-info ms-2" (click)="cleanFileHandler()"
+                [disabled]="isDisable">
+                <i class="fa-solid fa-eraser pe-2"></i> Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Image Viewer Modal -->
+<div class="modal fade" id="imageViewerModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="imageViewerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered mh-100 mt-0 mb-0">
+    <div class="modal-content mh-100">
+      <a href="javascript:void(0)" class="position-absolute" style="right: -39px;" data-bs-dismiss="modal" aria-label="Close">
+        <i class="fa-solid fa-circle-xmark fa-2x text-white"></i>
+      </a>
+      <div class="modal-body">
+        <img [src]="imagePreviewUrl" alt="" width="100%">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Pdf viewer modal -->
+<div class="d-none file-container" id="file-container" (click)="closePdfViewer()">
+  <div class="text-end">
+    <a (click)="closePdfViewer()" class="close_view">
+      <i class="fa-solid fa-xmark fa-2x" aria-hidden="true"></i>
+    </a>
+  </div>
+  <iframe src="" width="800px" height="600px" style="border: none; background-color: white;"></iframe>
+</div>
+
+<!-- SQL and XML viewer modal -->
+<div class="modal fade" id="xmlViewModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="imageViewerModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered mt-0 mb-0">
+    <div class="modal-content">
+      <a href="javascript:void(0)" class="position-absolute z-3" style="right: -39px;" data-bs-dismiss="modal" aria-label="Close">
+        <i class="fa-solid fa-circle-xmark fa-2x text-white"></i>
+      </a>
+      <div class="modal-body">
+        @if (fileContent) {
+          <pre class="xml-container"><code [innerText]="fileContent"></code></pre>
+        }
+      </div>
+    </div>
+  </div>
+</div>

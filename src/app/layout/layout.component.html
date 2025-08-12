@@ -1,0 +1,118 @@
+@if (loaderService.isLoading | async) {
+  <div class="position-fixed z-3">
+    <ngb-progressbar class="mb-3" [value]="loaderService.loadPercentage$ | async" />
+  </div>
+}
+
+<div>
+  <nav class="py-0 border-bottom bg-light">
+    <div class="container-fluid px-2 py-2 d-flex align-items-center">
+      <!-- Left side - @ symbol -->
+      <div class="navbar-brand me-3">
+        <a class="navbar-brand" href="javascript:void(0)" [routerLink]="'repository'">
+          <img src="https://www.emstum.com/assets/images/logo.png" alt="logo" style="width: 10vw;">
+        </a>
+      </div>
+     
+        <!-- Center - Title with divider -->
+        <div class="d-flex flex-grow-1 align-items-center">
+           @if (isDahsboard) {
+            <span class="fw-bold text-dark">Dashboard</span>
+          } @else {
+              <span class="fw-bold">bottomhalf/{{currentRepoName}}</span>
+              <a href="javascript:void(0)" class="text-decoration-none ps-2" (click)="editRepoNamePopup()">
+                <i class="fa-solid fa-pencil"></i>
+              </a>
+            }
+        </div>
+  
+      <!-- Right side - Search and icons -->
+      <div class="d-flex align-items-center justify-content-end">
+        <!-- Search box -->
+         <div class="form-control form-control-sm col-md-4 p-0 m-0">
+          <div class="d-flex align-items-center">
+            <i class="fa-solid fa-magnifying-glass px-2"></i>
+            <input type="text" class="form-control form-control-sm border-0" placeholder="Type to serach">
+          </div>
+         </div>
+        <!-- Icons with counters -->
+        <div class="d-flex">
+           <a href="javascript:void(0)" class="text-dark px-3 text-decoration-none" (click)="logout()" placement="start" ngbTooltip="Logout">
+             <i class="fa-solid fa-arrow-right-from-bracket"></i>
+           </a>
+        </div>
+      </div>
+    </div>
+  
+    <!-- Main navigation items -->
+     @if (!isDahsboard) {
+       <ul class="d-flex UnderlineNav-body px-2 list-unstyled m-0">
+         @for (item of mainNavItem; track $index) {
+           <li class="me-2">
+             <a href="javascript:void(0)" class="text-dark text-decoration-none px-2" (click)="navigatePage(item)" [ngClass]="{'u-nav-item': item.id == activeTab}">
+               <i class="pe-1" [class]="item.icon"></i> {{item.name}}
+             </a>
+           </li>
+         }
+       </ul>
+     }
+  </nav>
+</div>
+
+<!-- <div class="nav-bg-img">
+  <nav class="navbar navbar-expand-lg pb-3 nav-bg position-sticky" style="top: 0; z-index: 999999 !important; height: 3.2rem;" [ngClass]="{ 'scrolled shadow-sm': isScrolled }">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="javascript:void(0)" [routerLink]="'repository'">
+        <img src="https://www.emstum.com/assets/images/logo.png" alt="logo" style="width: 10vw;">
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <li class="nav-item">
+            <a class="nav-link fw-semibold" href="javascript:void(0)" [routerLink]="'repository'">Dashboard</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link fw-semibold" href="javascript:void(0)" [routerLink]="'token_history'">Tokens</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav mb-2 mb-lg-0">
+          <li class="nav-item ms-auto" placement="start" ngbTooltip="Logout">
+            <a class="nav-link fw-bold text-dark" href="javascript:void(0)" (click)="logout()">
+              <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</div> -->
+<router-outlet></router-outlet>
+
+<!-- Manage Repository -->
+<div class="modal fade" id="manageRepositoryModal" tabindex="-1" aria-labelledby="manageRepositoryModalLabel" aria-hidden="true"
+  data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content px-3">
+      <div class="modal-header border-bottom-0">
+        <h1 class="modal-title fs-5" id="manageRepositoryModalLabel">Reanme repository name</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+          <label class="form-label">Repository Name <span class="text-danger">*</span></label>
+          <input type="text" class="form-control" placeholder="Folder Name" [(ngModel)]="newRepoName"
+            [ngClass]="{'error-field': submitted && (newRepoName == null || newRepoName == '')}">
+        </div>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" [disabled]="isLoading">Close</button>
+        <button type="button" class="btn btn-primary-c" [disabled]="isLoading" (click)="editRepoName()">
+          <i class="fa-solid" [ngClass]="{'fa-spinner fa-spin': isLoading, 'fa-floppy-disk': !isLoading}"></i>
+          {{ isLoading ? 'Wait' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

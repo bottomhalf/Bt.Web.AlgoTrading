@@ -1,0 +1,163 @@
+<div class="d-flex font-segoe">
+  <!-- Sidebar -->
+  <div class="col-md-3 sidebar border-end">
+    <div class="p-3 border-bottom">
+      <input type="text" class="form-control search-input" (keyup.enter)="getTickers($event)" placeholder="Search eg: infy bse, nifty fut, index fund, etc"/>
+    </div>
+    <div class="p-3 border-bottom text-muted small">
+      <i class="fa-solid fa-coins me-2"></i>Currency (3/250)
+    </div>
+    <div class="fw-bold p-2 border-bottom small-headline">
+      Default (3):
+    </div>
+    @if(isTickerAvailable) {
+      <div class="w-lst-item">
+        <div *ngFor="let item of tickerDetails" class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom item-item">
+          <span><i class="fa-solid fa-chart-line me-2 text-primary"></i>{{item.name}}</span>
+          <span class="text-success">
+            {{item.expiry}}
+          </span>
+          <span class="fw-bold text-danger">{{item.instrumenttype}}</span>
+          <a href="javascript:void(0)" (click)="getMarketData(item)">
+            <span class="badge bg-primary">
+              <i class="fa-solid fa-chart-line me-2"></i>
+            </span>
+          </a>
+        </div>
+      </div>  
+    } @else {
+      <div *ngFor="let item of currencyItems" class="d-flex justify-content-between align-items-center px-3 py-2 border-bottom item-item">
+        <span><i class="fa-solid fa-chart-line me-2 text-primary"></i>{{item.name}}</span>
+        <span [ngClass]="{'text-danger': item.diff < 0, 'text-success': item.diff > 0}">
+          {{item.diff}} ({{item.change}}%)
+        </span>
+        <span class="fw-bold text-danger">{{item.value}}</span>
+      </div>
+    }
+  </div>
+
+  <!-- Main Content -->
+  <div class="col-md-9 flex-grow-1 bg-white content-container">
+    @if(isDataLoaded) {
+      <div class="container-fluid d-flex align-items-center p-3 justify-content-center bg-light font-segoe">
+        <div class="col-12 shadow-sm account-card">
+          <div class="card-body p-4">
+            <!-- Greeting -->
+            <h4 class="fw-semibold mb-4">Hi, {{user.name}}</h4>
+            <!-- Balance Overview Row -->
+            @if(isStockDetailLoaded) {
+              <div class="row mb-4 g3">
+                <div class="col-6 col-md-6">
+                  <div class="border rounded p-3 bg-white h-100">
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fa-solid fa-coins text-primary me-2 fs-5"></i>
+                      <span class="fw-medium text-muted">{{stockDetail.tradingSymbol}}</span>
+                    </div>
+                    <div class="fs-2 fw-bold mb-2" style="letter-spacing: 1px;">{{stockDetail.ltp}}</div>
+                    <div class="d-flex flex-wrap small text-muted gap-3">
+                      <span>Margins used <strong>0</strong></span>
+                      <span>Opening balance <strong>40.09k</strong></span>
+                    </div>
+                    <a href="#" class="d-block small mt-2 text-primary"><i class="fa-solid fa-up-right-from-square me-1"></i>View statement</a>
+                  </div>
+                </div>
+              </div>
+            } @else {
+              <div class="row mb-4 g-3">
+                <div class="col-6 col-md-6">
+                  <div class="border rounded p-3 bg-white h-100">
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fa-solid fa-coins text-primary me-2 fs-5"></i>
+                      <span class="fw-medium text-muted">Equity</span>
+                    </div>
+                    <div class="fs-2 fw-bold mb-2" style="letter-spacing: 1px;">40.09k</div>
+                    <div class="d-flex flex-wrap small text-muted gap-3">
+                      <span>Margins used <strong>0</strong></span>
+                      <span>Opening balance <strong>40.09k</strong></span>
+                    </div>
+                    <a href="#" class="d-block small mt-2 text-primary"><i class="fa-solid fa-up-right-from-square me-1"></i>View statement</a>
+                  </div>
+                </div>
+                <div class="col-6 col-md-6">
+                  <div class="border rounded p-3 bg-white h-100">
+                    <div class="d-flex align-items-center mb-2">
+                      <i class="fa-solid fa-lemon text-warning me-2 fs-5"></i>
+                      <span class="fw-medium text-muted">Commodity</span>
+                    </div>
+                    <div class="fs-2 fw-bold mb-2 text-secondary" style="letter-spacing: 1px;">0</div>
+                    <div class="d-flex flex-wrap small text-muted gap-3">
+                      <span>Margins used <strong>0</strong></span>
+                      <span>Opening balance <strong>0</strong></span>
+                    </div>
+                    <a href="#" class="d-block small mt-2 text-primary"><i class="fa-solid fa-up-right-from-square me-1"></i>View statement</a>
+                  </div>
+                </div>
+              </div>
+            }
+            <!-- Empty Portfolio Notice -->
+            <div class="text-center mt-5 mb-3">
+              <i class="fa-solid fa-briefcase fa-3x mb-3 text-secondary"></i>
+              <div class="mb-3 text-muted">You don't have any stocks in your DEMAT yet. Get started with absolutely free equity investments.</div>
+              <button class="btn btn-primary px-4 py-2 fw-semibold"><i class="fa-solid fa-arrow-right-to-bracket me-2"></i>Start investing</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div>Loading ...</div>
+    }
+
+    @if(isStockDetailLoaded) {
+      <div>
+        <!-- Top bar -->
+        <div class="d-flex align-items-center border-bottom px-3 py-2 gap-2 topbar-custom">
+          <span class="fs-5 fw-bold me-2"><i class="fa-solid fa-dollar-sign me-1"></i>USDINR AUG FUT</span>
+          <button class="btn btn-primary btn-sm ms-1 px-3"><i class="fa-solid fa-copy me-1"></i>Copy</button>
+          <button class="btn btn-info btn-sm text-white ms-1 px-3"><i class="fa-solid fa-download me-1"></i>Download</button>
+          <span class="ms-2 p-2 px-3 rounded border bg-light small-notice">
+            <i class="fa-solid fa-info-circle text-info me-1"></i>Trade from chart is not available for Heikin Ashi chart.
+          </span>
+          <span class="ms-auto d-md-none"><i class="fa-solid fa-bars"></i></span>
+        </div>
+        <!-- Table -->
+        <div class="overflow-auto table-responsive" style="max-height: 72vh;">
+          <table class="table table-hover table-sm align-middle m-0 custom-table">
+            <thead class="table-light">
+              <tr>
+                <th>Date</th>
+                <th>Open</th>
+                <th>High</th>
+                <th>Low</th>
+                <th>Close</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let row of tableData">
+                <td>{{row.date}}</td>
+                <td>{{row.open}}</td>
+                <td>{{row.high}}</td>
+                <td>{{row.low}}</td>
+                <td>{{row.close}}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <!-- Footer -->
+        <div class="d-flex justify-content-between align-items-center p-3 mt-1 small-footer">
+          <span class="fw-bold text-success"><i class="fa-solid fa-arrow-up me-1"></i>Chg. 1.43%</span>
+          <div class="d-flex gap-2 text-secondary">
+            <span class="footer-btn">1D</span>
+            <span class="footer-btn">5D</span>
+            <span class="footer-btn">1M</span>
+            <span class="footer-btn">6M</span>
+            <span class="footer-btn">YTD</span>
+            <span class="footer-btn">1Y</span>
+            <span class="footer-btn">5Y</span>
+          </div>
+        </div>
+      </div>
+    } @else {
+      <div>No record found</div>
+    }
+  </div>
+</div>

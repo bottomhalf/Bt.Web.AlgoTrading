@@ -1,0 +1,166 @@
+<div class="d-flex justify-content-between align-items-center" style="height: 50px; background-color: #ffffff;">
+  <div class="col-auto d-flex align-items-center">
+    <a href="javascript:void(0)" class="text-decoration-none ms-2" placement="end" ngbTooltip="back" (click)="goBack()">
+      <i class="fa-solid fa-arrow-left"></i>
+    </a>
+    <div class="col-auto">
+      <app-breadcrums [title]="'Generate bill'" [routes]="routePath" (loadRoute)="loadRoute($event)"></app-breadcrums>
+    </div>
+  </div>
+  <button class="btn btn-primary-c mt-1 me-1" (click)="showFileNamePopup()">Save</button>
+</div>
+
+<div class="editor-container">
+  <div class="toolbar">
+    <div class="toolbar-left">
+      <select [(ngModel)]="fileDetail.Extension" (change)="onLanguageChange()" class="language-select">
+        <option value="txt">Text</option>
+        <option value="json">JSON</option>
+        <option value="xml">XML</option>
+      </select>
+      <button (click)="formatCode()" class="btn-c btn-format">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M4 6h8v1H4V6zM4 8h8v1H4V8zM4 10h5v1H4v-1z"/>
+        </svg>
+        Format
+      </button>
+      <button (click)="copyToClipboard(j)" class="btn-c btn-copy" [ngbTooltip]="'Copied!'" triggers="manual" #j="ngbTooltip">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+          <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+        </svg>
+        Copy
+      </button>
+      <select [(ngModel)]="selectedFontSize" (change)="onFontSizeChange()" class="language-select">
+        <option [value]="100">100%</option>
+        <option [value]="150">150%</option>
+        <option [value]="200">200%</option>
+        <option [value]="300">300%</option>
+        <option [value]="400">400%</option>
+        <option [value]="500">500%</option>
+      </select>
+      <button (click)="copyRequestToClipboard(t)" class="btn-c btn-copy" [ngbTooltip]="'Copied!'" triggers="manual" #t="ngbTooltip">
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+          <path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1v-1z"/>
+          <path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5h3zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0h-3z"/>
+        </svg>
+        Copy url
+      </button>
+      <button class="btn-c btn-format" (click)="showRequestBodypopup()">
+        <i class="bi bi-braces-asterisk"></i>
+        View request body
+      </button>
+    </div>
+    <div class="toolbar-right">
+      <span class="file-info">
+        Lines: {{lineCount}} | Characters: {{fileDetail.Content.length}}
+        <span *ngIf="errorMessage" class="error-indicator">⚠ Error</span>
+      </span>
+    </div>
+  </div>
+
+  <div class="editor-wrapper">
+    <div class="line-numbers" #lineNumbers>
+      <div *ngFor="let line of lineNumbersArray; let i = index" 
+        class="line-number"
+        [class.active]="i + 1 === currentLine">
+        {{i + 1}}
+      </div>
+    </div>
+
+    @if (isPageReady) {
+      <div class="code-area">
+        <textarea #codeTextarea [(ngModel)]="fileDetail.Content" (input)="onContentChange()" (scroll)="onScroll()" (keydown)="onKeyDown($event)"
+          (click)="updateCurrentLine()" (keyup)="updateCurrentLine()" class="code-textarea" [class.error]="!!errorMessage"
+          placeholder="Enter your {{fileDetail.Extension}} code here..." spellcheck="false" [style.fontSize]="fontSize">
+        </textarea>
+        
+        <div class="syntax-overlay" #syntaxOverlay>
+          <div [innerHTML]="highlightedContent" class="highlighted-content"></div>
+        </div>
+      </div>
+    } @else {
+      <div class="d-flex justify-content-center align-items-center" style="height: 70vh; width: 100vw;">
+        <div class="spinner-border" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (errorMessage) {
+      <div class="error-panel">
+        <div class="error-header">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
+            <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+            <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+          </svg>
+          Syntax Error
+        </div>
+        <div class="error-message">{{errorMessage}}</div>
+      </div>
+  }
+
+  <div class="status-bar">
+    <span>Ln {{currentLine}}, Col {{currentColumn}}</span>
+    <span>{{fileDetail.Extension}}</span>
+    <span [class]="errorMessage ? 'status-error' : 'status-ok'">
+      {{errorMessage ? 'Error' : 'Ready'}}
+    </span>
+  </div>
+</div>
+
+<div class="modal fade" id="fileNameModal" tabindex="-1" aria-labelledby="fileNameModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-body">
+        @if (fileDetail != null) {
+          <div>
+            <label class="form-label">File Name (without extension)</label>
+            <input type="text" [(ngModel)]="fileDetail.FileName" class="form-control" placeholder="File Name">
+          </div>
+        }
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" [disabled]="isLoading">Close</button>
+        <button type="button" class="btn btn-primary-c" [disabled]="isLoading" (click)="saveContent()">
+          <i [ngClass]="{'fa-solid fa-spinner fa-spin': isLoading, 'fa-regular fa-floppy-disk': !isLoading}"></i>
+          {{ isLoading ? 'Wait' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="requestBodyModal" tabindex="-1" aria-labelledby="requestBodyModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content px-3">
+      <div class="modal-header border-bottom-0">
+        <h1 class="modal-title fs-5" id="requestBodyModalLabel">Request Body</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12 form-control p-0 m-0 position-relative">
+          <div class="d-flex align-items-center">
+            <span class="px-2 fw-semibold" style="color: #ad7a03;">POST</span>
+            <input type="text" class="form-control border-0 rounded-0 border-start" readonly [value]="sampleUrl" placeholder="Enter URL">
+          </div>
+          <a href="javascript:void(0)" class="text-decoration-none text-muted copy-req-body position-absolute" (click)="copyRequestToClipboard(x)" [ngbTooltip]="'Copied!'" triggers="manual" #x="ngbTooltip">
+            <i class="bi bi-clipboard"></i>
+          </a>
+        </div>
+        <div class="col-md-12 mt-3">
+          Body (JSON)
+        </div>
+        <div class="col-md-12 mt-3 position-relative">
+          <textarea rows="12" class="form-control req-body-area" [(ngModel)]="sampleBody"></textarea>
+          <a href="javascript:void(0)" class="text-decoration-none text-muted copy-req-body position-absolute" (click)="copyRequestBodyToClipboard(m)" [ngbTooltip]="'Copied!'" triggers="manual" #m="ngbTooltip">
+            <i class="bi bi-clipboard"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

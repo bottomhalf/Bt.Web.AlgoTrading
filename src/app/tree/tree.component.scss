@@ -1,0 +1,28 @@
+/* Remove bullets from ul */
+ul {
+  list-style-type: none;
+}
+li {
+  line-height: 140%;
+}
+
+.folder-button {
+  cursor: pointer;
+  // width: 22px;
+  // height: 22px;
+  // margin-right: 12px;
+}
+
+/* .folder-icon {
+  width: 22px;
+  height: 22px;
+} */
+
+.folder-button-label {
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.item-name {
+  //margin-left: 34px;
+}

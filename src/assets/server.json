@@ -1,0 +1,17 @@
+[
+    {
+        "Id": 1,
+        "ServerName": "HOSTINGER 2024",
+        "Server": "178.16.138.169",
+        "Port": "3308",
+        "Database": "ems_master",
+        "User_Id": "root"
+    }, {
+        "Id": 12,
+        "ServerName": "HOSTINGER 2025",
+        "Server": "178.16.138.169",
+        "Port": "3308",
+        "Database": "ems_master",
+        "User_Id": "root"
+    }
+]

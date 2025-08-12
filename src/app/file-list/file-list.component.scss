@@ -1,0 +1,67 @@
+.file-name:hover {
+    text-decoration: underline !important;
+}
+
+.left-sidebar {
+    height: calc(100vh - 6.7rem);
+    overflow: auto;
+}
+
+.ifilezone {
+  background-image: url("/assets/drag&drop.jpg") !important;
+  background-size: 100% 100%;
+  cursor: pointer;
+  -moz-border-radius: 5px;
+  -webkit-border-radius: 5px;
+  border-radius: 5px;
+  padding: 25px;
+  text-align: center;
+  background-color: #f8f7f7;
+  min-height: 12rem !important;
+  background-repeat: no-repeat;
+}
+
+.filetitle {
+  font-size: 20px;
+  font-weight: bold;
+  border-bottom: 1px solid #d9d9d9;
+  padding-bottom: 10px;
+  margin-bottom: 20px;
+}
+
+.custom-bg {
+  background-color: #f6f6f6 !important;;
+}
+
+.file-container {
+  position: fixed;
+  z-index: 9999;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  bottom: 0px;
+  padding: 0rem 14rem;
+  background: #4444447a;
+}
+
+.file-container>iframe {
+  height: 100%;
+  width: 100%;
+  z-index: 999999;
+}
+
+.close_view {
+  text-decoration: none;
+  position: absolute;
+  margin-left: 1%;
+  margin-top: 13px;
+  color: #fff !important;
+}
+
+.xml-container {
+  height: calc(100vh - 3.2rem) !important;
+}
+
+.folder-color {
+  color: #74C0FC !important;
+}

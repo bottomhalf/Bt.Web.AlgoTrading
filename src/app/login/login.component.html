@@ -1,0 +1,42 @@
+<div class="container-fluid d-flex align-items-center justify-content-between vh-100">
+    <div class="signin-container">
+        <div class="text-center">
+            <h1 class="text-white">EMSTUM</h1>
+            <h1 class="text-white">Team Login</h1>
+        </div>
+        <form class="mt-4">
+            <!-- <div class="input-group mb-3 rounded" [ngClass]="{'error-validation': submitted && (company == null || company == '')}">
+                <span class="input-group-text">
+                   <i class="fa-solid fa-landmark"></i>
+                </span>
+                <select class="form-select" [(ngModel)]="company" name="company">
+                    <option value="bottomhalf" selected>Bottomhalf</option>
+                    <option value="elitepay">ElitePay</option>
+                </select>
+            </div> -->
+            <div class="input-group mb-3 rounded" [ngClass]="{'error-validation': submitted && (email == null || email == '')}">
+                <span class="input-group-text">
+                    <i class="fa-solid fa-user"></i>
+                </span>
+                <input type="text" class="form-control" autocomplete="off" placeholder="Email address" [(ngModel)]="email" required name="email">
+            </div>
+            <div class="position-relative">
+                <div class="input-group mb-3" [ngClass]="{'error-validation': submitted && (password == null || password == '')}">
+                    <span class="input-group-text">
+                        <i class="fa-solid fa-lock"></i>
+                    </span>
+                    <input [type]="type" autocomplete="off" class="form-control" placeholder="Password" name="password" [(ngModel)]="password" required>
+                </div>
+                <a href="javascript:void(0)" class="position-absolute text-dark" style="right: 1%; top: 13%; z-index: 9999 !important;" (click)="showHidePassword()">
+                    <i class="fa-solid " [ngClass]="{'fa-eye-slash': !isPasswordShow, 'fa-eye': isPasswordShow}"></i>
+                </a>
+            </div>
+            <div class="d-grid mb-4">
+                <button type="submit" class="btn btn-primary-c" (click)="login()" [disabled]="isLoading">
+                    <i class="fa-solid " [ngClass]="{'fa-spinner fa-spin': isLoading, 'fa-arrow-right-to-bracket': !isLoading}"></i>
+                    <span class="ps-2">{{isLoading ? 'Wait': 'Login'}}</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

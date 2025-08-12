@@ -1,0 +1,146 @@
+<div class="container mt-3">
+    <div class="row align-items-center justify-content-between">
+        <h5 class="col-auto">Personal access tokens (classic)</h5>
+        <button class="btn btn-primary-c col-auto" (click)="generateNewToken()">Generate Token</button>
+    </div>
+    <hr>
+    <p>
+        Tokens you have generated that can be used to access the
+        <a href="https://docs.github.com/en/rest" target="_blank">Emstum API</a>.
+    </p>
+
+    @if (isReady && tokenHistory.length > 0) {
+    <!-- Token: Project Generator -->
+    <div class="card">
+    @for(item of tokenHistory; track $index; let last= $last) {
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+                <a href="javascript:void(0)" class="fw-semibold text-decoration-none text-c">{{item.TokenName}}</a>
+                <div class="col-auto row align-items-center">
+                    <div class="col-auto text-muted small">Last used within the last week</div>
+                    @if (!isTokenExpired(item.GeneratedToken)) {
+                      <button class="btn btn-warning me-2 btn-sm col-auto" (click)="regenerateTokenPop(item)" title="Re-Generate"><i class="fa-solid fa-rotate"></i></button>
+                    }
+                    <button class="btn btn-danger btn-sm col-auto" (click)="deleteTokenPop(item)" title="Delete"><i class="fa-regular fa-trash-can"></i></button>
+                </div>
+            </div>
+            <div class="col mt-2">
+                <label class="form-label">
+                    <i class="bi bi-key text-danger" style="transform: rotate(60deg); display: inline-block;"></i>
+                    Token
+                </label>
+                <div class="align-items-center">
+                    <div class="d-inline-block bg-light border rounded px-2 py-1">
+                        <div class="col text-muted d-inline-block text-break">{{item.GeneratedToken}}</div>
+                        <div class="d-flex justify-content-end mt-2">
+                            <button type="button" class="btn btn-sm btn-outline-secondary align-items-end" [ngbTooltip]="'Copied!'" triggers="manual" #j="ngbTooltip"
+                                (click)="copyToClipboard(item.GeneratedToken, j)" title="Copy token">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="alert alert-warning  py-1 mt-2 px-3 mb-2">
+              @if (isTokenExpired(item.GeneratedToken)) {
+                  <span class="text-danger fw-semibold pe-1"><i class="bi bi-x-square-fill"></i> Expired on {{getTokenExpiration(item.GeneratedToken) | date: "EEE, MMM dd, yyyy 'at' hh:mm a"}}</span>
+              } @else {
+                  <i class="fas fa-exclamation-triangle pe-1"></i>This token will expire on {{getTokenExpiration(item.GeneratedToken) | date: "EEE, MMM dd, yyyy 'at' hh:mm a"}}
+              }                
+            </div>
+        </div>
+        @if (!last) {
+            <hr class="my-0 py-0">
+        }
+    }
+    </div>
+    } @else {
+    <div>Loading ...</div>
+    }
+
+    <!-- Info Box -->
+    <div class="alert alert-secondary mt-4 small">
+        Personal access tokens (classic) function like ordinary OAuth access tokens.
+        They can be used instead of a password for Emstum over HTTPS, or can be used to
+        <a href="javascript:void(0)" class="text-decoration-none">authenticate to the API over Basic Authentication</a>.
+    </div>
+</div>
+
+<!-- Add Token Modal -->
+<div class="modal fade" id="addTokenModal" tabindex="-1" aria-labelledby="addTokenModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content px-3">
+      <div class="modal-header border-bottom-0">
+        <h1 class="modal-title fs-5" id="addTokenModalLabel">Generate Token</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <div class="col-md-12">
+            <label class="form-label">File Name <span class="text-danger">*</span></label>
+            <input type="text" class="form-control" placeholder="File Name" [(ngModel)]="requestTokenBody.TokenName" [ngClass]="{'error-field': submitted && (requestTokenBody.TokenName == null || requestTokenBody.TokenName == '')}">
+        </div>
+        <div class="col-md-12 mt-3">
+            <label class="form-label">Key <span class="text-danger">*</span></label>
+            <input type="number" class="form-control" [OnlyNumber]="10" placeholder="Secret key" [(ngModel)]="requestTokenBody.ExpiryTimeInSeconds" [ngClass]="{'error-field': submitted && (requestTokenBody.ExpiryTimeInSeconds == null)}">
+        </div>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+         <button type="button" class="btn btn-primary-c" [disabled]="isLoading" (click)="saveTokenDetail()">
+            <i class="fa-solid" [ngClass]="{'fa-spinner fa-spin': isLoading, 'fa-floppy-disk': !isLoading}"></i>
+            {{ isLoading ? 'Wait' : 'Save' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Re Generate Token Modal -->
+<div class="modal fade" id="regenerateTokenModal" tabindex="-1" aria-labelledby="regenerateTokenModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content px-3">
+      <div class="modal-header border-bottom-0">
+        <h1 class="modal-title fs-5" id="regenerateTokenModalLabel">Re-Generate Token</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h5>Do you want to regenerate the token?</h5>
+        <p class="mb-0">
+            After regenerating, the old token will no longer be valid or usable. If you wish to proceed, click Yes.
+        </p>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+         <button type="button" class="btn btn-primary-c" [disabled]="isLoading" (click)="regenerateToken()">
+            <i class="fa-solid" [ngClass]="{'fa-spinner fa-spin': isLoading, 'fa-floppy-disk': !isLoading}"></i>
+            {{ isLoading ? 'Wait' : 'Yes' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Token Modal -->
+<div class="modal fade" id="deleteTokenModal" tabindex="-1" aria-labelledby="deleteTokenModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content px-3">
+      <div class="modal-header border-bottom-0">
+        <h1 class="modal-title fs-5" id="deleteTokenModalLabel">Delete Token</h1>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        <h5>Are you sure to delete this token?</h5>
+        <p class="mb-0">
+            This action is irreversible. Once deleted, the token will no longer be valid or usable. Click Yes to confirm.
+        </p>
+      </div>
+      <div class="modal-footer border-top-0">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+         <button type="button" class="btn btn-primary-c" [disabled]="isLoading" (click)="deleteToken()">
+            <i class="fa-solid" [ngClass]="{'fa-spinner fa-spin': isLoading, 'fa-floppy-disk': !isLoading}"></i>
+            {{ isLoading ? 'Wait' : 'Yes' }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

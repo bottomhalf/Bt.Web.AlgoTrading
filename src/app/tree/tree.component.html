@@ -1,0 +1,38 @@
+<ul class="col-md-12 text-truncate ps-2">
+    @for (node of _nodes; track $index) {
+        <li class="">
+            <div class="d-flex align-items-center">
+                @if (node.children?.length>0) {
+                    <button class="border-0 bg-white folder-button" (click)="onFolderButtonClick(node)">
+                        @if (node.expand) {
+                            <svg aria-hidden="true" focusable="false" class="octicon octicon-chevron-down" viewBox="0 0 12 12" width="12" height="12" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: middle;"><path d="M6 8.825c-.2 0-.4-.1-.5-.2l-3.3-3.3c-.3-.3-.3-.8 0-1.1.3-.3.8-.3 1.1 0l2.7 2.7 2.7-2.7c.3-.3.8-.3 1.1 0 .3.3.3.8 0 1.1l-3.2 3.2c-.2.2-.4.3-.6.3Z"></path></svg>
+                        } @else {
+                            <svg aria-hidden="true" focusable="false" class="octicon octicon-chevron-right" viewBox="0 0 12 12" width="12" height="12" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: middle;"><path d="M4.7 10c-.2 0-.4-.1-.5-.2-.3-.3-.3-.8 0-1.1L6.9 6 4.2 3.3c-.3-.3-.3-.8 0-1.1.3-.3.8-.3 1.1 0l3.3 3.2c.3.3.3.8 0 1.1L5.3 9.7c-.2.2-.4.3-.6.3Z"></path></svg>
+                        }
+                    </button>
+                }
+    
+                <label class="text-truncate py-1" [ngClass]="{'item-name': !node.children?.length }">
+                    @if (node.extension == 'dir') {
+                        @if (node.expand) {
+                            <i class="fa-solid fa-folder-open" style="color: #74C0FC;"></i>
+                        } @else {
+                            <i class="fa-solid fa-folder" style="color: #74C0FC;"></i>
+                        }
+                    } @else {
+                        <button class="border-0 bg-white folder-button invisible">
+                            <svg aria-hidden="true" focusable="false" class="octicon octicon-chevron-down" viewBox="0 0 12 12" width="12" height="12" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: middle;"><path d="M6 8.825c-.2 0-.4-.1-.5-.2l-3.3-3.3c-.3-.3-.3-.8 0-1.1.3-.3.8-.3 1.1 0l2.7 2.7 2.7-2.7c.3-.3.8-.3 1.1 0 .3.3.3.8 0 1.1l-3.2 3.2c-.2.2-.4.3-.6.3Z"></path></svg>
+                        </button>
+                        <svg aria-hidden="true" focusable="false" class="octicon octicon-file" viewBox="0 0 16 16" width="16" height="16" fill="currentColor" display="inline-block" overflow="visible" style="vertical-align: middle;"><path d="M2 1.75C2 .784 2.784 0 3.75 0h6.586c.464 0 .909.184 1.237.513l2.914 2.914c.329.328.513.773.513 1.237v9.586A1.75 1.75 0 0 1 13.25 16h-9.5A1.75 1.75 0 0 1 2 14.25Zm1.75-.25a.25.25 0 0 0-.25.25v12.5c0 .138.112.25.25.25h9.5a.25.25 0 0 0 .25-.25V6h-2.75A1.75 1.75 0 0 1 9 4.25V1.5Zm6.75.062V4.25c0 .138.112.25.25.25h2.688l-.011-.013-2.914-2.914-.013-.011Z"></path></svg>
+                    }
+                    <a href="javascript:void(0)" class="text-decoration-none ps-2 text-dark" (click)="viewFile(node)">
+                        {{node.name}}
+                    </a>
+                </label>
+            </div>
+            @if (node.children && node.expand) {
+                <app-tree [nodes]="node.children" [parentId]="pid" (valueChange)="valueChange.emit($event)"></app-tree>
+            }            
+        </li>
+    }
+</ul>
